@@ -43,8 +43,8 @@ Project Link: [https://github.com/jaa2019/SerialLogger](https://github.com/jaa20
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[build-shield]: https://img.shields.io/badge/Build-fail-red.svg
-[test-shield]: https://img.shields.io/badge/Tests-fail-red.svg
+[build-shield]: https://img.shields.io/badge/Build-success-bright-green.svg
+[test-shield]: https://img.shields.io/badge/Tests-pass-green.svg
 [contributors-shield]: https://img.shields.io/github/contributors/jaa2019/CryptoChat.svg?style=badge
 [contributors-url]: https://github.com/jaa2019/CryptoChat/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/jaa2019/CryptoChat.svg?style=badge
