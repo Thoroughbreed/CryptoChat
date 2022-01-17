@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,14 @@ public class GreeterService : Greeter.GreeterBase
     {
         return Task.FromResult(new HelloReply
         {
-            Message = "Hello " + request.Name
+            Message = "Hello " + request.Name + " and welcome to the system.\nYou are now in chat-mode."
         });
+    }
+
+    public override Task<HelloReply> StartTalking(HelloRequest request, ServerCallContext context)
+    {
+        Console.Write(request.Name + ": ");
+        Console.WriteLine(request.Message);
+        return Task.FromResult(new HelloReply { Message = "Message received" });
     }
 }
