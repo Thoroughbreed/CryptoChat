@@ -17,13 +17,13 @@ CryptoChat is a lightweight client/server application with end-to-end encrypted 
 
 ### Roadmap
 - [ ] Build the base of the application
-- [ ] Enable multiple clients chatting
-- [ ] Enable private chat
-- [ ] Test encryption
-- [ ] Implement end-to-end encryption
-- [ ] Create a console-UI
-- [ ] Create an application UI
-- [ ] Create a web frontend
+- [ ] Enable multiple clients chatting
+- [ ] Enable private chat
+- [ ] Test encryption
+- [ ] Implement end-to-end encryption
+- [ ] Create a console-UI
+- [ ] Create an application UI
+- [ ] Create a web frontend
 
 ### License
 * Software: Apache 2.0
