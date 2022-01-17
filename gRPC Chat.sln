@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gRPC_Service", "gRPC_Service\gRPC_Service.csproj", "{CDF4AC1E-5A6C-42F3-9B2D-A6E369B7AD2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console Client", "Console Client\Console Client.csproj", "{0173BDF8-C622-45D2-A613-FF548719BA41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +8,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CDF4AC1E-5A6C-42F3-9B2D-A6E369B7AD2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CDF4AC1E-5A6C-42F3-9B2D-A6E369B7AD2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CDF4AC1E-5A6C-42F3-9B2D-A6E369B7AD2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CDF4AC1E-5A6C-42F3-9B2D-A6E369B7AD2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0173BDF8-C622-45D2-A613-FF548719BA41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0173BDF8-C622-45D2-A613-FF548719BA41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0173BDF8-C622-45D2-A613-FF548719BA41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0173BDF8-C622-45D2-A613-FF548719BA41}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
