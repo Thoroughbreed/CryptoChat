@@ -41,7 +41,7 @@ Jan Andreasen - jan@tved.it
 
 [![Twitter][twitter-shield]][twitter-url]
 
-Project Link: [https://github.com/jaa2019/SerialLogger](https://github.com/jaa2019/SerialLogger)
+Project Link: [https://github.com/jaa2019/CryptoChat](https://github.com/jaa2019/CryptoChat)
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
