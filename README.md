@@ -13,14 +13,18 @@ CryptoChat is a lightweight client/server application with end-to-end encrypted 
 | Version | Change |
 |-|-|
 | 0.0.1 | First release, smoke test |
+| 0.1.0 | Chat works! |
+| 0.1.2 | Multiple people can join |
+| 0.1.3 | Now with sessions |
+| 0.2.0 | Now with encryption |
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Roadmap
-- [ ] Build the base of the application
-- [ ] Enable multiple clients chatting
-- [ ] Enable private chat
-- [ ] Test encryption
-- [ ] Implement end-to-end encryption
+- [x] Build the base of the application
+- [x] Enable multiple clients chatting
+- [x] Enable private chat
+- [x] Test encryption
+- [x] Implement end-to-end encryption
 - [ ] Create a console-UI
 - [ ] Create an application (UI)
 - [ ] Create a web frontend
