@@ -16,17 +16,9 @@ namespace Console_Client
             var userName = Console.ReadLine();
             // Include port of the gRPC server as an application argument
             var port = args.Length > 0 ? args[0] : "5000";
-
-            // var channel = GrpcChannel.ForAddress("http://127.0.0.1:" + port,
-            //     new GrpcChannelOptions
-            //     {
-            //         Credentials = ChannelCredentials.Insecure
-            //     });
             Console.Write("Please type in IP of the server as xxx.xxx.xxx.xxx: ");
             var ip = Console.ReadLine();
-            
             var channel = new Channel(ip + ":" + port, ChannelCredentials.Insecure);
-            
             var client = new ChatRoom.ChatRoomClient(channel);
 
             using (var chat = client.join())
@@ -45,8 +37,10 @@ namespace Console_Client
                 string line;
                 while ((line = Console.ReadLine()) != null)
                 {
-                    if (line.ToLower() == "bye")
+                    if (line.ToLower() == ":q!")
                     {
+                        await chat.RequestStream.WriteAsync(new Message
+                            { User = userName, Text = $"{userName} has left the room" });
                         break;
                     }
                     await chat.RequestStream.WriteAsync(new Message { User = userName, Text = line });
