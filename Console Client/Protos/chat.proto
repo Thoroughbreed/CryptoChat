@@ -9,4 +9,6 @@ service ChatRoom {
 message Message {
   string user = 1;
   string text = 2;
+  string secret = 3;
+  string guid = 4;
 }
