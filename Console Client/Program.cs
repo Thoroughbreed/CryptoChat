@@ -23,7 +23,8 @@ namespace Console_Client
             // Include port of the gRPC server as an application argument
             var port = args.Length > 0 ? args[0] : "5000";
             Console.Write("Please type in IP of the server as xxx.xxx.xxx.xxx: ");
-            var ip = Console.ReadLine();
+            var input = Console.ReadLine();
+            var ip = input?.Length > 0 ? input : "127.0.0.1";
             Console.Write("Please enter your secret: ");
             _secret = _crypto.SetUnlockKey(Console.ReadLine());
             var channel = new Channel(ip + ":" + port, ChannelCredentials.Insecure);
@@ -36,12 +37,23 @@ namespace Console_Client
                     while (await chat.ResponseStream.MoveNext(cancellationToken: CancellationToken.None))
                     {
                         var response = chat.ResponseStream.Current;
-                        Console.WriteLine($"{response.User}: {_crypto.Decrypt(response.Text)}");
+                        var _output = response.Text;
+                        try
+                        {
+                            var _cipher = Convert.FromHexString(response.Text);
+                            _output = _crypto.Decrypt(_cipher);
+                        }
+                        finally
+                        {
+                            Console.WriteLine($"{response.User}: {_output}");
+                        }
                     }
                 });
 
                 await chat.RequestStream.WriteAsync(new Message
-                    { User = userName, Text = $"{userName} has joined the room", Secret = _secret, Guid = _guid.ToString()  });
+                {
+                    User = userName, Text = $"{userName} has joined the room", Secret = _secret, Guid = _guid.ToString()
+                });
 
                 string line;
                 while ((line = Console.ReadLine()) != null)
@@ -49,19 +61,24 @@ namespace Console_Client
                     if (line.ToLower() == ":q!")
                     {
                         await chat.RequestStream.WriteAsync(new Message
-                            { User = userName, Text = line, Secret = _secret, Guid = _guid.ToString()});
+                            { User = userName, Text = line, Secret = _secret, Guid = _guid.ToString() });
                         break;
                     }
 
                     if (line.ToLower() == "/list")
                     {
                         await chat.RequestStream.WriteAsync(new Message
-                            { User = userName, Text = line, Secret = _secret, Guid = _guid.ToString()});
-                        break;
+                            { User = userName, Text = line, Secret = _secret, Guid = _guid.ToString() });
                     }
-                    
-                    await chat.RequestStream.WriteAsync(new Message { User = userName, Text = _crypto.Decrypt(line), Secret = _secret, Guid = _guid.ToString() });
+                    else
+                    {
+                        await chat.RequestStream.WriteAsync(new Message
+                        {
+                            User = userName, Text = _crypto.Encrypt(line), Secret = _secret, Guid = _guid.ToString()
+                        });
+                    }
                 }
+
                 await chat.RequestStream.CompleteAsync();
             }
 

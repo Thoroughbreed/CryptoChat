@@ -53,7 +53,7 @@ namespace Console_Client.Crypto
         /// <returns>Cipher text</returns>
         public string Encrypt(string data)
         {
-            return Convert.ToBase64String(Crypto(Encoding.UTF8.GetBytes(data), true));
+            return Convert.ToHexString(Crypto(Encoding.UTF8.GetBytes(data), true));
         }
 
         /// <summary>
@@ -61,10 +61,9 @@ namespace Console_Client.Crypto
         /// </summary>
         /// <param name="text">Cipher text</param>
         /// <returns>Decrypted data</returns>
-        public string Decrypt(string cipher)
+        public string Decrypt(byte[] cipher)
         {
-            var _cipher = Convert.FromBase64String(cipher);
-            return Encoding.UTF8.GetString(Crypto(_cipher));
+            return Encoding.UTF8.GetString(Crypto(cipher));
         }
 
         /// <summary>
