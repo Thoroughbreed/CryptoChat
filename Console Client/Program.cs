@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Chat;
+using Console_Client.Crypto;
 using Grpc.Core;
 using Channel = Grpc.Core.Channel;
 
@@ -12,6 +13,7 @@ namespace Console_Client
     {
         private static string _secret = "";
         private static Guid _guid;
+        private static CryptoClass _crypto = new();
 
         static async Task Main(string[] args)
         {
@@ -23,7 +25,7 @@ namespace Console_Client
             Console.Write("Please type in IP of the server as xxx.xxx.xxx.xxx: ");
             var ip = Console.ReadLine();
             Console.Write("Please enter your secret: ");
-            _secret = Console.ReadLine();
+            _secret = _crypto.SetUnlockKey(Console.ReadLine());
             var channel = new Channel(ip + ":" + port, ChannelCredentials.Insecure);
             var client = new ChatRoom.ChatRoomClient(channel);
 
@@ -34,7 +36,7 @@ namespace Console_Client
                     while (await chat.ResponseStream.MoveNext(cancellationToken: CancellationToken.None))
                     {
                         var response = chat.ResponseStream.Current;
-                        Console.WriteLine($"{response.User}: {response.Text}");
+                        Console.WriteLine($"{response.User}: {_crypto.Decrypt(response.Text)}");
                     }
                 });
 
@@ -50,8 +52,15 @@ namespace Console_Client
                             { User = userName, Text = line, Secret = _secret, Guid = _guid.ToString()});
                         break;
                     }
+
+                    if (line.ToLower() == "/list")
+                    {
+                        await chat.RequestStream.WriteAsync(new Message
+                            { User = userName, Text = line, Secret = _secret, Guid = _guid.ToString()});
+                        break;
+                    }
                     
-                    await chat.RequestStream.WriteAsync(new Message { User = userName, Text = line, Secret = _secret, Guid = _guid.ToString() });
+                    await chat.RequestStream.WriteAsync(new Message { User = userName, Text = _crypto.Decrypt(line), Secret = _secret, Guid = _guid.ToString() });
                 }
                 await chat.RequestStream.CompleteAsync();
             }
