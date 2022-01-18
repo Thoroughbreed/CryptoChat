@@ -36,10 +36,10 @@ namespace Web_Server.Services
                 await GetList(message);
                 return;
             }
-            if (message.Secret == ":q!")
+            if (message.Text == ":q!")
             {
                 Remove(Guid.Parse(message.Guid));
-                message.Guid = "";
+                message.Text = $"{message.User} just left the room ...";
             }
 
             Guid _guid;

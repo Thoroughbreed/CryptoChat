@@ -47,7 +47,7 @@ namespace Console_Client
                     if (line.ToLower() == ":q!")
                     {
                         await chat.RequestStream.WriteAsync(new Message
-                            { User = userName, Text = $"{userName} has left the room", Secret = ":q!", Guid = _guid.ToString()});
+                            { User = userName, Text = line, Secret = _secret, Guid = _guid.ToString()});
                         break;
                     }
                     
