@@ -21,7 +21,7 @@ namespace Console_Client
         {
             Guid guid = Guid.NewGuid();
             string conn = "127.0.0.1:5000";
-            string user = "Default User";
+            string? user = "Default User";
             string room = "1";
             bool mainMenuActive = true;
             
@@ -77,7 +77,7 @@ namespace Console_Client
                         {
                             _output = _crypto.Decrypt(Convert.FromHexString(response.Text));
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             _output = response.Text;
                         }
@@ -95,7 +95,7 @@ namespace Console_Client
                     User = user, Text = $"{user} has joined the room", Room = room, Guid = guid.ToString()
                 });
 
-                string line; // prepares for input
+                string? line; // prepares for input
                 while ((line = Console.ReadLine()) != null)
                 {
                     if (line.ToLower() == ":q!") // Quit dammit!
@@ -158,7 +158,7 @@ namespace Console_Client
         {
             Console.Clear();
             bool _bool = true;
-            string? input = "";
+            string? input;
             string ip = "";
             string port = "";
             
@@ -176,8 +176,8 @@ namespace Console_Client
                     Console.WriteLine("Out of range, please input a number between 1 and 65535");
                 }
             } while (_bool);
-            port = input.Length > 0 ? input : "5000";
-
+            port = input ?? "5000"; // null-coalescing expression = input != null
+            
             do
             {
                 Console.Write("Please enter IP of the server: ");
@@ -188,17 +188,17 @@ namespace Console_Client
                     Console.WriteLine("Please try again, input format was wrong. it should be xxx.xxx.xxx.xxx");
                 }
             } while (!_bool);
-            ip = input.Length > 0 ? input : "127.0.0.1";
+            ip = input ?? "127.0.0.1"; // null-coalescing expression = input != null
             
             return ip + ":" + port;
         }
 
-        static string UserInformation()
+        static string? UserInformation()
         {
             Console.Clear();
             Console.Write("Please type in your username: ");
-            string user = Console.ReadLine();
-            user = user.Length > 0 ? user : "Default user";
+            string? user = Console.ReadLine();
+            user ??= "Default user"; // Compound assignment (Is user not null, if it is then =)
             Console.Write("Please input the shared secret: ");
             _crypto.SetUnlockKey(_hide.HideInput());
             return user;

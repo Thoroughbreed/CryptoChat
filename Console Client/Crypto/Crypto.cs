@@ -51,15 +51,15 @@ namespace Console_Client.Crypto
         /// </summary>
         /// <param name="data">String to be encrypted</param>
         /// <returns>Cipher text</returns>
-        public string Encrypt(string data)
+        public string Encrypt(string? data)
         {
-            return Convert.ToHexString(Crypto(Encoding.UTF8.GetBytes(data), true));
+            return data != null ? Convert.ToHexString(Crypto(Encoding.UTF8.GetBytes(data), true)) : "Error, you never should see this!";
         }
 
         /// <summary>
         /// Decrypt a cipher text
         /// </summary>
-        /// <param name="text">Cipher text</param>
+        /// <param name="cipher">Cipher text</param>
         /// <returns>Decrypted data</returns>
         public string Decrypt(byte[] cipher)
         {

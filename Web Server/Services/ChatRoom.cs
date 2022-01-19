@@ -1,19 +1,15 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
-using Microsoft.Extensions.Logging;
-using Web_Server;
 using Web_Server.Classes;
 
 namespace Web_Server.Services
 {
     public partial class ChatRoom
     {
-        // private ConcurrentDictionary<string, IServerStreamWriter<Message>> _users = new();
-        private List<User> _users = new();
+        private List<User?> _users = new();
 
         public void Join(string name, IServerStreamWriter<Message> response, string room, string guid)
         {
@@ -21,10 +17,8 @@ namespace Web_Server.Services
             {
                 _users.Add(new User(name, response, room, guid));
             }
-            // _users.TryAdd(name, response);
         }
 
-        // public void Remove(string name) => _users.TryRemove(name, out var s);
         public void Remove(Guid guid) => _users.Remove(_users.FirstOrDefault(u => u.Guid == guid));
 
         public async Task BroadcastMessageAsync(Message message) => await BroadcastMessages(message);
@@ -46,6 +40,7 @@ namespace Web_Server.Services
                 {
                     await RenameUser(message);
                 }
+
                 return;
             }
             else if (message.Text == ":q!")
@@ -59,101 +54,94 @@ namespace Web_Server.Services
             {
                 foreach (var user in _users)
                 {
-                    User _user = null;
+                    User? foundUser = null;
                     try
                     {
-                        _user = await SendMessageToSubscriber(user, message);
+                        foundUser = await SendMessageToSubscriber(user, message);
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
-                        Remove(_user.Guid);
+                        if (foundUser != null) Remove(foundUser.Guid);
                     }
 
-                    if (_user != null)
-                    {
-                        Remove(_user.Guid);
-                    }
+                    if (foundUser != null) Remove(foundUser.Guid);
                 }
             }
 
             foreach (var user in _users.Where(x => x.Guid != Guid.Parse(message.Guid)))
             {
-                if (message.Room == user.Room)
+                if (message.Room == user?.Room)
                 {
-                    User _user = null;
+                    User? foundUser = null;
                     try
                     {
-                        _user = await SendMessageToSubscriber(user, message);
+                        foundUser = await SendMessageToSubscriber(user, message);
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
-                        Remove(_user.Guid);
-                        break;
+                        if (foundUser != null) Remove(foundUser.Guid);
                     }
 
-                    if (_user != null)
-                    {
-                        Remove(_user.Guid);
-                        break;
-                    }
+                    if (foundUser != null) Remove(foundUser.Guid);
                 }
             }
         }
 
         private async Task RenameUser(Message message)
         {
-            var _tempName = message.User;
-            var _user = _users.FirstOrDefault(x => x.Guid == Guid.Parse(message.Guid));
-            _user.Name = message.Text.Substring(3);
-            await SendMessageToSubscriber(_user,
-                new Message { Text = $"Your username is now {_user.Name} - it was changed from {_tempName}" });
-            var _userList = _users.Where(u => u.Room == message.Room);
-            foreach (var user in _userList.Where(u => u != _user))
+            var tempName = message.User;
+            var foundUser = _users.FirstOrDefault(x => x.Guid == Guid.Parse(message.Guid));
+            if (foundUser != null)
             {
-                await SendMessageToSubscriber(user,
-                    new Message { Text = $"{_tempName} is henceforth known as {_user.Name}" });
+                foundUser.Name = message.Text.Substring(3);
+                await SendMessageToSubscriber(foundUser,
+                    new Message { Text = $"Your username is now {foundUser.Name} - it was changed from {tempName}" });
+                var userList = _users.Where(u => u.Room == message.Room);
+                foreach (var user in userList.Where(u => u != foundUser))
+                {
+                    await SendMessageToSubscriber(user,
+                        new Message { Text = $"{tempName} is henceforth known as {foundUser.Name}" });
+                }
             }
         }
 
         private async Task ChangeRoom(Message message)
         {
-            var _user = _users.FirstOrDefault(u => u.Guid == Guid.Parse(message.Guid));
-            var _tempRoom = _user.Room;
-            _user.Room = message.Room;
-            await SendMessageToSubscriber(_user,
-                new Message { Text = $"Your room is now {_user.Room} - it was changed from {_tempRoom}" });
-            
-            var _userList = _users.Where(u => u.Room == message.Room);
-            foreach (var user in _userList.Where(u => u != _user))
+            var foundUser = _users.FirstOrDefault(u => u.Guid == Guid.Parse(message.Guid));
+            if (foundUser != null)
             {
-                await SendMessageToSubscriber(user,
-                    new Message { Text = $"{_user.Name} entered the sphere!" });
-            }
-            
-        }
-        
-        private async Task GetList(Message message)
-        {
-            var _user = _users.FirstOrDefault(x => x.Guid == Guid.Parse(message.Guid));
-            int i = 0;
-            foreach (var user in _users)
-            {
-                if (user.Room == message.Room)
+                var tempRoom = foundUser.Room;
+                foundUser.Room = message.Room;
+                await SendMessageToSubscriber(foundUser,
+                    new Message { Text = $"Your room is now {foundUser.Room} - it was changed from {tempRoom}" });
+
+                var userList = _users.Where(u => u.Room == message.Room);
+                foreach (var user in userList.Where(u => u != foundUser))
                 {
-                    i++;
-                    await SendMessageToSubscriber(_user, new Message { Text = $"User number {i} - {user.Name}" });
+                    await SendMessageToSubscriber(user,
+                        new Message { Text = $"{foundUser.Name} entered the sphere!" });
                 }
             }
         }
 
-        private async Task<User> SendMessageToSubscriber(User user, Message message)
+        private async Task GetList(Message message)
+        {
+            var foundUser = _users.FirstOrDefault(x => x.Guid == Guid.Parse(message.Guid));
+            int i = 0;
+            foreach (var user in _users.Where(user => user?.Room == message.Room))
+            {
+                i++;
+                await SendMessageToSubscriber(foundUser, new Message { Text = $"User number {i} - {user?.Name}" });
+            }
+        }
+
+        private async Task<User?> SendMessageToSubscriber(User? user, Message message)
         {
             try
             {
                 await user.Message.WriteAsync(message);
-                // await user.Value.WriteAsync(message);
                 return null;
             }
             catch (Exception ex)
