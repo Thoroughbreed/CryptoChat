@@ -11,7 +11,7 @@ namespace Console_Client
 {
     public class Program
     {
-        private static string _secret = "";
+        private static string _room = "";
         private static Guid _guid;
         private static CryptoClass _crypto = new();
 
@@ -26,7 +26,10 @@ namespace Console_Client
             var input = Console.ReadLine();
             var ip = input?.Length > 0 ? input : "127.0.0.1";
             Console.Write("Please enter your secret: ");
-            _secret = _crypto.SetUnlockKey(Console.ReadLine());
+            _crypto.SetUnlockKey(Console.ReadLine());
+            Console.WriteLine("Please select chatroom:");
+            Console.WriteLine("[1] Room 1\n[2] Room 2\n[3] Room 3\n[4] Room 4\n");
+            _room = Console.ReadLine();
             var channel = new Channel(ip + ":" + port, ChannelCredentials.Insecure);
             var client = new ChatRoom.ChatRoomClient(channel);
 
@@ -44,7 +47,6 @@ namespace Console_Client
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e.Message);
                             _output = response.Text;
                         }
                         Console.WriteLine($"{response.User}: {_output}");
@@ -53,7 +55,7 @@ namespace Console_Client
 
                 await chat.RequestStream.WriteAsync(new Message
                 {
-                    User = userName, Text = $"{userName} has joined the room", Secret = _secret, Guid = _guid.ToString()
+                    User = userName, Text = $"{userName} has joined the room", Room = _room, Guid = _guid.ToString()
                 });
 
                 string line;
@@ -62,20 +64,25 @@ namespace Console_Client
                     if (line.ToLower() == ":q!")
                     {
                         await chat.RequestStream.WriteAsync(new Message
-                            { User = userName, Text = line, Secret = _secret, Guid = _guid.ToString() });
+                            { User = userName, Text = line, Room = _room, Guid = _guid.ToString() });
                         break;
                     }
-
                     if (line.ToLower() == "/list")
                     {
                         await chat.RequestStream.WriteAsync(new Message
-                            { User = userName, Text = line, Secret = _secret, Guid = _guid.ToString() });
+                            { User = userName, Text = line, Room = _room, Guid = _guid.ToString() });
+                    }
+                    else if (line.StartsWith("/rename"))
+                    {
+                        await chat.RequestStream.WriteAsync(new Message
+                            { User = userName, Text = line, Room = _room, Guid = _guid.ToString() });
+                        userName = line.Substring(6);
                     }
                     else
                     {
                         await chat.RequestStream.WriteAsync(new Message
                         {
-                            User = userName, Text = _crypto.Encrypt(line), Secret = _secret, Guid = _guid.ToString()
+                            User = userName, Text = _crypto.Encrypt(line), Room = _room, Guid = _guid.ToString()
                         });
                     }
                 }

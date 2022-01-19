@@ -20,7 +20,7 @@ namespace Web_Server.Services
         
             do
             {
-                _chatroomService.Join(requestStream.Current.User,responseStream, requestStream.Current.Secret, requestStream.Current.Guid);
+                _chatroomService.Join(requestStream.Current.User,responseStream, requestStream.Current.Room, requestStream.Current.Guid);
                 await _chatroomService.BroadcastMessageAsync(requestStream.Current);
             } while (await requestStream.MoveNext());
         }

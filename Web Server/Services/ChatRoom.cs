@@ -15,11 +15,11 @@ namespace Web_Server.Services
         // private ConcurrentDictionary<string, IServerStreamWriter<Message>> _users = new();
         private List<User> _users = new();
 
-        public void Join(string name, IServerStreamWriter<Message> response, string secret, string guid)
+        public void Join(string name, IServerStreamWriter<Message> response, string room, string guid)
         {
             if (_users.Find(u => u.Guid == Guid.Parse(guid)) == null)
             {
-                _users.Add(new User(name, response, secret, guid));
+                _users.Add(new User(name, response, room, guid));
             }
             // _users.TryAdd(name, response);
         }
@@ -36,7 +36,12 @@ namespace Web_Server.Services
                 await GetList(message);
                 return;
             }
-            if (message.Text == ":q!")
+            else if (message.Text.StartsWith("/rename"))
+            {
+                await RenameUser(message);
+                return;
+            }
+            else if (message.Text == ":q!")
             {
                 Remove(Guid.Parse(message.Guid));
                 message.Text = $"{message.User} just left the room ...";
@@ -67,7 +72,7 @@ namespace Web_Server.Services
 
             foreach (var user in _users.Where(x => x.Guid != Guid.Parse(message.Guid)))
             {
-                if (message.Secret == user.Secret)
+                if (message.Room == user.Room)
                 {
                     User _user = null;
                     try
@@ -90,13 +95,27 @@ namespace Web_Server.Services
             }
         }
 
+        private async Task RenameUser(Message message)
+        {
+            var _tempName = message.User;
+            var _user = _users.FirstOrDefault(x => x.Guid == Guid.Parse(message.Guid));
+            _user.Name = message.Text.Substring(6);
+            await SendMessageToSubscriber(_user,
+                new Message { Text = $"Your username is now {_user.Name} - it was changed from {_tempName}" });
+            var _userList = _users.Where(u => u.Room == message.Room);
+            foreach (var user in _userList)
+            {
+                await SendMessageToSubscriber(user,
+                    new Message { Text = $"{_tempName} is henceforth known as {_user.Name}" });
+            }
+        }
         private async Task GetList(Message message)
         {
             var _user = _users.FirstOrDefault(x => x.Guid == Guid.Parse(message.Guid));
             int i = 0;
             foreach (var user in _users)
             {
-                if (user.Secret == message.Secret)
+                if (user.Room == message.Room)
                 {
                     i++;
                     await SendMessageToSubscriber(_user, new Message { Text = $"User number {i} - {user.Name}" });
