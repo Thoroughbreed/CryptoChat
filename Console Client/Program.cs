@@ -118,10 +118,22 @@ namespace Console_Client
                         }
                         else
                         {
-                            user = line.Substring(2);
+                            user = line.Substring(3);
                         }
                         await chat.RequestStream.WriteAsync(new Message
                             { User = user, Text = line, Room = room, Guid = guid.ToString() });
+                    }
+                    else if (line.StartsWith("pwd")) // changes the shared secret/encryption key
+                    {
+                        if (line.Length == 3)
+                        {
+                            Console.Write("Enter the new encryption key: ");
+                            _crypto.SetUnlockKey(_hide.HideInput());
+                        }
+                        else
+                        {
+                            _crypto.SetUnlockKey(line.Substring(4));
+                        }
                     }
                     else
                     {

@@ -106,11 +106,11 @@ namespace Web_Server.Services
         {
             var _tempName = message.User;
             var _user = _users.FirstOrDefault(x => x.Guid == Guid.Parse(message.Guid));
-            _user.Name = message.Text.Substring(2);
+            _user.Name = message.Text.Substring(3);
             await SendMessageToSubscriber(_user,
                 new Message { Text = $"Your username is now {_user.Name} - it was changed from {_tempName}" });
             var _userList = _users.Where(u => u.Room == message.Room);
-            foreach (var user in _userList)
+            foreach (var user in _userList.Where(u => u != _user))
             {
                 await SendMessageToSubscriber(user,
                     new Message { Text = $"{_tempName} is henceforth known as {_user.Name}" });
@@ -124,6 +124,14 @@ namespace Web_Server.Services
             _user.Room = message.Room;
             await SendMessageToSubscriber(_user,
                 new Message { Text = $"Your room is now {_user.Room} - it was changed from {_tempRoom}" });
+            
+            var _userList = _users.Where(u => u.Room == message.Room);
+            foreach (var user in _userList.Where(u => u != _user))
+            {
+                await SendMessageToSubscriber(user,
+                    new Message { Text = $"{_user.Name} entered the sphere!" });
+            }
+            
         }
         
         private async Task GetList(Message message)
