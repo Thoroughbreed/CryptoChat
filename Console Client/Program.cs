@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Chat;
 using Console_Client.Crypto;
+using Console_Client.Utils;
 using Grpc.Core;
 using Channel = Grpc.Core.Channel;
 
@@ -11,26 +13,17 @@ namespace Console_Client
 {
     public class Program
     {
-        private static string _room = "";
-        private static Guid _guid;
         private static CryptoClass _crypto = new();
+        private static ObscureText _hide = new();
 
         static async Task Main(string[] args)
         {
-            _guid = Guid.NewGuid();
-            Console.Write("Welcome! Please type in your username: ");
-            var userName = Console.ReadLine();
-            // Include port of the gRPC server as an application argument
-            var port = args.Length > 0 ? args[0] : "5000";
-            Console.Write("Please type in IP of the server as xxx.xxx.xxx.xxx: ");
-            var input = Console.ReadLine();
-            var ip = input?.Length > 0 ? input : "127.0.0.1";
-            Console.Write("Please enter your secret: ");
-            _crypto.SetUnlockKey(Console.ReadLine());
-            Console.WriteLine("Please select chatroom:");
-            Console.WriteLine("[1] Room 1\n[2] Room 2\n[3] Room 3\n[4] Room 4\n");
-            _room = Console.ReadLine();
-            var channel = new Channel(ip + ":" + port, ChannelCredentials.Insecure);
+            Guid guid = Guid.NewGuid();
+            string conn = ChangeSettings();
+            string user = UserInformation();
+            string room = SelectRoom();
+            
+            var channel = new Channel(conn, ChannelCredentials.Insecure);
             var client = new ChatRoom.ChatRoomClient(channel);
 
             using (var chat = client.join())
@@ -49,13 +42,14 @@ namespace Console_Client
                         {
                             _output = response.Text;
                         }
+
                         Console.WriteLine($"{response.User}: {_output}");
                     }
                 });
 
                 await chat.RequestStream.WriteAsync(new Message
                 {
-                    User = userName, Text = $"{userName} has joined the room", Room = _room, Guid = _guid.ToString()
+                    User = user, Text = $"{user} has joined the room", Room = room, Guid = guid.ToString()
                 });
 
                 string line;
@@ -64,25 +58,26 @@ namespace Console_Client
                     if (line.ToLower() == ":q!")
                     {
                         await chat.RequestStream.WriteAsync(new Message
-                            { User = userName, Text = line, Room = _room, Guid = _guid.ToString() });
+                            { User = user, Text = line, Room = room, Guid = guid.ToString() });
                         break;
                     }
+
                     if (line.ToLower() == "ls")
                     {
                         await chat.RequestStream.WriteAsync(new Message
-                            { User = userName, Text = line, Room = _room, Guid = _guid.ToString() });
+                            { User = user, Text = line, Room = room, Guid = guid.ToString() });
                     }
                     else if (line.StartsWith("mv"))
                     {
                         await chat.RequestStream.WriteAsync(new Message
-                            { User = userName, Text = line, Room = _room, Guid = _guid.ToString() });
-                        userName = line.Substring(2);
+                            { User = user, Text = line, Room = room, Guid = guid.ToString() });
+                        user = line.Substring(2);
                     }
                     else
                     {
                         await chat.RequestStream.WriteAsync(new Message
                         {
-                            User = userName, Text = _crypto.Encrypt(line), Room = _room, Guid = _guid.ToString()
+                            User = user, Text = _crypto.Encrypt(line), Room = room, Guid = guid.ToString()
                         });
                     }
                 }
@@ -92,6 +87,62 @@ namespace Console_Client
 
             Console.WriteLine("Disconnecting");
             await channel.ShutdownAsync();
+            Console.WriteLine("Thank you ...");
+            ASCII.DOOM();
+        }
+
+        private static string ChangeSettings()
+        {
+            bool _bool = false;
+            string? input = "";
+            string ip = "";
+            string port = "";
+            
+            do
+            {
+                Console.Write("Please enter port number: ");
+                input = Console.ReadLine();
+                _bool = int.TryParse(input, out var test);
+                if (_bool && (test !< 65536 || test !> 0))
+                {
+                    _bool = false;
+                }
+                else
+                {
+                    Console.WriteLine("Out of range, please input a number between 1 and 65535");
+                }
+            } while (!_bool);
+            port = input.Length > 0 ? input : "5000";
+
+            do
+            {
+                Console.Write("Please enter IP of the server: ");
+                input = Console.ReadLine();
+                _bool = IPAddress.TryParse(input, out var test);
+                if (!_bool)
+                {
+                    Console.WriteLine("Please try again, input format was wrong. it should be xxx.xxx.xxx.xxx");
+                }
+            } while (!_bool);
+            ip = input.Length > 0 ? input : "127.0.0.1";
+            
+            return ip + ":" + port;
+        }
+
+        static string UserInformation()
+        {
+            Console.Write("Please type in your username: ");
+            string user = Console.ReadLine();
+            user = user.Length > 0 ? user : "Default user";
+            Console.Write("Please input the shared secret: ");
+            _crypto.SetUnlockKey(_hide.HideInput());
+            return user;
+        }
+
+        private static string SelectRoom()
+        {
+            // TODO
+            return "1";
         }
     }
 }
