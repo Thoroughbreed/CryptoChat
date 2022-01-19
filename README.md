@@ -9,6 +9,13 @@
 ### What is this?
 CryptoChat is a lightweight client/server application with end-to-end encrypted chat.
 
+### Commands
+Besides the menu, you have the following commands at your use:
+- :q! - Quit dammit!
+- ls - lists current users in the room
+- mv - If you just type mv, you move room, but if you input arguments like `mv NewName` you rename yourself
+- pwd - If you just type pwd you can change your secure key (hidden), if you add arguments like `pdw NewPassword` it changes to NewPassword
+
 ### Changelog
 | Version | Change |
 |-|-|
@@ -17,6 +24,8 @@ CryptoChat is a lightweight client/server application with end-to-end encrypted 
 | 0.1.2 | Multiple people can join |
 | 0.1.3 | Now with sessions |
 | 0.2.0 | Now with encryption |
+| 0.2.5 | Works with multiple users |
+| 0.5.0 | UI added to the client, possibility to change name, password etc. |
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Roadmap
@@ -25,7 +34,7 @@ CryptoChat is a lightweight client/server application with end-to-end encrypted 
 - [x] Enable private chat
 - [x] Test encryption
 - [x] Implement end-to-end encryption
-- [ ] Create a console-UI
+- [x] Create a console-UI
 - [ ] Create an application (UI)
 - [ ] Create a web frontend
 - [ ] Further expansions?
