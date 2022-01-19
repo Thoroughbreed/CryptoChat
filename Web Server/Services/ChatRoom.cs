@@ -38,7 +38,14 @@ namespace Web_Server.Services
             }
             else if (message.Text.StartsWith("mv"))
             {
-                await RenameUser(message);
+                if (message.Text.Length == 2)
+                {
+                    await ChangeRoom(message);
+                }
+                else
+                {
+                    await RenameUser(message);
+                }
                 return;
             }
             else if (message.Text == ":q!")
@@ -109,6 +116,16 @@ namespace Web_Server.Services
                     new Message { Text = $"{_tempName} is henceforth known as {_user.Name}" });
             }
         }
+
+        private async Task ChangeRoom(Message message)
+        {
+            var _user = _users.FirstOrDefault(u => u.Guid == Guid.Parse(message.Guid));
+            var _tempRoom = _user.Room;
+            _user.Room = message.Room;
+            await SendMessageToSubscriber(_user,
+                new Message { Text = $"Your room is now {_user.Room} - it was changed from {_tempRoom}" });
+        }
+        
         private async Task GetList(Message message)
         {
             var _user = _users.FirstOrDefault(x => x.Guid == Guid.Parse(message.Guid));
