@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Grpc.Core;
 
@@ -22,9 +23,6 @@ namespace Web_Server.Services
                 _chatroomService.Join(requestStream.Current.User,responseStream, requestStream.Current.Secret, requestStream.Current.Guid);
                 await _chatroomService.BroadcastMessageAsync(requestStream.Current);
             } while (await requestStream.MoveNext());
-        
-            // _chatroomService.Remove(context.Peer);
-            // TODO fix removal 
         }
     }
 }

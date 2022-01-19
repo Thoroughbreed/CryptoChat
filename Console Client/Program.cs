@@ -40,13 +40,14 @@ namespace Console_Client
                         var _output = response.Text;
                         try
                         {
-                            var _cipher = Convert.FromHexString(response.Text);
-                            _output = _crypto.Decrypt(_cipher);
+                            _output = _crypto.Decrypt(Convert.FromHexString(response.Text));
                         }
-                        finally
+                        catch (Exception e)
                         {
-                            Console.WriteLine($"{response.User}: {_output}");
+                            Console.WriteLine(e.Message);
+                            _output = response.Text;
                         }
+                        Console.WriteLine($"{response.User}: {_output}");
                     }
                 });
 
