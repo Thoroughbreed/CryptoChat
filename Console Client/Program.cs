@@ -67,16 +67,16 @@ namespace Console_Client
                             { User = userName, Text = line, Room = _room, Guid = _guid.ToString() });
                         break;
                     }
-                    if (line.ToLower() == "/list")
+                    if (line.ToLower() == "ls")
                     {
                         await chat.RequestStream.WriteAsync(new Message
                             { User = userName, Text = line, Room = _room, Guid = _guid.ToString() });
                     }
-                    else if (line.StartsWith("/rename"))
+                    else if (line.StartsWith("mv"))
                     {
                         await chat.RequestStream.WriteAsync(new Message
                             { User = userName, Text = line, Room = _room, Guid = _guid.ToString() });
-                        userName = line.Substring(6);
+                        userName = line.Substring(2);
                     }
                     else
                     {

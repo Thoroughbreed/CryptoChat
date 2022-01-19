@@ -31,12 +31,12 @@ namespace Web_Server.Services
 
         private async Task BroadcastMessages(Message message)
         {
-            if (message.Text == "/list")
+            if (message.Text == "ls")
             {
                 await GetList(message);
                 return;
             }
-            else if (message.Text.StartsWith("/rename"))
+            else if (message.Text.StartsWith("mv"))
             {
                 await RenameUser(message);
                 return;
@@ -99,7 +99,7 @@ namespace Web_Server.Services
         {
             var _tempName = message.User;
             var _user = _users.FirstOrDefault(x => x.Guid == Guid.Parse(message.Guid));
-            _user.Name = message.Text.Substring(6);
+            _user.Name = message.Text.Substring(2);
             await SendMessageToSubscriber(_user,
                 new Message { Text = $"Your username is now {_user.Name} - it was changed from {_tempName}" });
             var _userList = _users.Where(u => u.Room == message.Room);
