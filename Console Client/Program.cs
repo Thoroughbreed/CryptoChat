@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Channels;
@@ -19,15 +20,53 @@ namespace Console_Client
         static async Task Main(string[] args)
         {
             Guid guid = Guid.NewGuid();
-            string conn = ChangeSettings();
-            string user = UserInformation();
-            string room = SelectRoom();
+            string conn = "127.0.0.1:5000";
+            string user = "Default User";
+            string room = "1";
+            bool mainMenuActive = true;
             
+            ASCII mainMenu = new (new List<string>
+            {
+                "Change Settings",
+                "Enter user info (and shared secret)",
+                "Select room",
+                "Chat!",
+                "-- EXIT --"
+            });
+            do
+            {
+                switch (mainMenu.Draw())
+                {
+                    case 0:
+                        conn = ChangeSettings();
+                        break;
+                    case 1:
+                        user = UserInformation();
+                        break;
+                    case 2:
+                        room = SelectRoom();
+                        break;
+                    case 3:
+                        mainMenuActive = false;
+                        break;
+                    case 4:
+                        Console.WriteLine();
+                        Environment.Exit(0);
+                        break;
+                    case 9: // Quit the menu if user presses either X or ESC
+                        Console.WriteLine();
+                        Environment.Exit(0);
+                        break;
+                }
+            } while (mainMenuActive);
+            Console.WriteLine();
+            Console.CursorVisible = true;
             var channel = new Channel(conn, ChannelCredentials.Insecure);
             var client = new ChatRoom.ChatRoomClient(channel);
 
             using (var chat = client.join())
             {
+                #region Listen for messages (async)
                 _ = Task.Run(async () =>
                 {
                     while (await chat.ResponseStream.MoveNext(cancellationToken: CancellationToken.None))
@@ -46,32 +85,43 @@ namespace Console_Client
                         Console.WriteLine($"{response.User}: {_output}");
                     }
                 });
+                #endregion
 
+                #region Write messages
+                
+                // User joins the server and handles the server it's name, room and guid
                 await chat.RequestStream.WriteAsync(new Message
                 {
                     User = user, Text = $"{user} has joined the room", Room = room, Guid = guid.ToString()
                 });
 
-                string line;
+                string line; // prepares for input
                 while ((line = Console.ReadLine()) != null)
                 {
-                    if (line.ToLower() == ":q!")
+                    if (line.ToLower() == ":q!") // Quit dammit!
                     {
                         await chat.RequestStream.WriteAsync(new Message
                             { User = user, Text = line, Room = room, Guid = guid.ToString() });
                         break;
                     }
 
-                    if (line.ToLower() == "ls")
+                    if (line.ToLower() == "ls") // List users in the room
                     {
                         await chat.RequestStream.WriteAsync(new Message
                             { User = user, Text = line, Room = room, Guid = guid.ToString() });
                     }
-                    else if (line.StartsWith("mv"))
+                    else if (line.StartsWith("mv")) // Rename username or move to room
                     {
+                        if (line.Length == 2)
+                        {
+                            room = SelectRoom();
+                        }
+                        else
+                        {
+                            user = line.Substring(2);
+                        }
                         await chat.RequestStream.WriteAsync(new Message
                             { User = user, Text = line, Room = room, Guid = guid.ToString() });
-                        user = line.Substring(2);
                     }
                     else
                     {
@@ -83,17 +133,19 @@ namespace Console_Client
                 }
 
                 await chat.RequestStream.CompleteAsync();
+                #endregion
             }
 
             Console.WriteLine("Disconnecting");
             await channel.ShutdownAsync();
             Console.WriteLine("Thank you ...");
-            ASCII.DOOM();
+            ASCII.DOOM(); // Doom :P
         }
 
         private static string ChangeSettings()
         {
-            bool _bool = false;
+            Console.Clear();
+            bool _bool = true;
             string? input = "";
             string ip = "";
             string port = "";
@@ -111,7 +163,7 @@ namespace Console_Client
                 {
                     Console.WriteLine("Out of range, please input a number between 1 and 65535");
                 }
-            } while (!_bool);
+            } while (_bool);
             port = input.Length > 0 ? input : "5000";
 
             do
@@ -131,6 +183,7 @@ namespace Console_Client
 
         static string UserInformation()
         {
+            Console.Clear();
             Console.Write("Please type in your username: ");
             string user = Console.ReadLine();
             user = user.Length > 0 ? user : "Default user";
@@ -141,8 +194,35 @@ namespace Console_Client
 
         private static string SelectRoom()
         {
-            // TODO
-            return "1";
+            do
+            {
+                ASCII subMenu = new(new List<string>()
+                {
+                    "Room 1",
+                    "Room 2",
+                    "Room 3",
+                    "Room 4"
+                });
+                switch (subMenu.Draw(true))
+                {
+                case 0:
+                    Console.WriteLine();
+                    Console.CursorVisible = true;
+                    return "1";
+                case 1:
+                    Console.WriteLine();
+                    Console.CursorVisible = true;
+                    return "2";
+                case 2:
+                    Console.WriteLine();
+                    Console.CursorVisible = true;
+                    return "3";
+                case 3:
+                    Console.WriteLine();
+                    Console.CursorVisible = true;
+                    return "4";
+                }
+            } while (true);
         }
     }
 }

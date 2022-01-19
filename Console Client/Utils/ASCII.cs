@@ -59,9 +59,9 @@ namespace Console_Client.Utils
         /// Draws the menu itself
         /// </summary>
         /// <returns>Integer for the list index</returns>
-        public int Draw()
+        public int Draw(bool clear = true)
         {
-            if (_clear)
+            if (_clear && clear)
                 Console.Clear();
 
             Console.CursorVisible = false;
