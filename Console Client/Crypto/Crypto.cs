@@ -1,7 +1,4 @@
 using System;
-using System.Buffers.Text;
-using System.Collections.Generic;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -70,12 +67,12 @@ namespace Console_Client.Crypto
         /// Gets the master-password and sets the unlock key
         /// </summary>
         /// <param name="unlock">Master-password</param>
-        public string SetUnlockKey(string unlock)
+        public bool SetUnlockKey(string unlock)
         {
             var bytes = Encoding.UTF8.GetBytes(unlock);
             using SHA256 sha256 = SHA256.Create();
             _masterKey = Convert.ToHexString(sha256.ComputeHash(bytes));
-            return unlock;
+            return true;
         }
     }
 }

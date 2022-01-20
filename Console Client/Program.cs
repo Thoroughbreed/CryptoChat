@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
 using Chat;
 using Console_Client.Crypto;
@@ -16,6 +15,7 @@ namespace Console_Client
     {
         private static CryptoClass _crypto = new();
         private static ObscureText _hide = new();
+        private static bool _isKeySet = false;
 
         static async Task Main(string[] args)
         {
@@ -61,6 +61,11 @@ namespace Console_Client
             } while (mainMenuActive);
             Console.WriteLine();
             Console.CursorVisible = true;
+            if (!_isKeySet)
+            {
+                Console.Write("Please input the shared secret: ");
+                _isKeySet = _crypto.SetUnlockKey(_hide.HideInput());
+            }
             var channel = new Channel(conn, ChannelCredentials.Insecure);
             var client = new ChatRoom.ChatRoomClient(channel);
 
@@ -74,13 +79,9 @@ namespace Console_Client
                         var response = chat.ResponseStream.Current;
                         var _output = response.Text;
                         try
-                        {
-                            _output = _crypto.Decrypt(Convert.FromHexString(response.Text));
-                        }
+                        { _output = _crypto.Decrypt(Convert.FromHexString(response.Text)); }
                         catch (Exception)
-                        {
-                            _output = response.Text;
-                        }
+                        { _output = response.Text; }
 
                         Console.WriteLine($"{response.User}: {_output}");
                     }
@@ -157,11 +158,21 @@ namespace Console_Client
         private static string ChangeSettings()
         {
             Console.Clear();
-            bool _bool = true;
+            bool _bool;
             string? input;
-            string ip = "";
-            string port = "";
             
+            do
+            {
+                Console.Write("Please enter IP of the server: ");
+                input = Console.ReadLine();
+                _bool = IPAddress.TryParse(input, out var test);
+                if (!_bool)
+                {
+                    Console.WriteLine("Please try again, input format was wrong. it should be xxx.xxx.xxx.xxx");
+                }
+            } while (!_bool);
+            string ip = input ?? "127.0.0.1";
+
             do
             {
                 Console.Write("Please enter port number: ");
@@ -176,19 +187,7 @@ namespace Console_Client
                     Console.WriteLine("Out of range, please input a number between 1 and 65535");
                 }
             } while (_bool);
-            port = input ?? "5000"; // null-coalescing expression = input != null
-            
-            do
-            {
-                Console.Write("Please enter IP of the server: ");
-                input = Console.ReadLine();
-                _bool = IPAddress.TryParse(input, out var test);
-                if (!_bool)
-                {
-                    Console.WriteLine("Please try again, input format was wrong. it should be xxx.xxx.xxx.xxx");
-                }
-            } while (!_bool);
-            ip = input ?? "127.0.0.1"; // null-coalescing expression = input != null
+            string port = input ?? "5000";
             
             return ip + ":" + port;
         }
@@ -200,7 +199,7 @@ namespace Console_Client
             string? user = Console.ReadLine();
             user ??= "Default user"; // Compound assignment (Is user not null, if it is then =)
             Console.Write("Please input the shared secret: ");
-            _crypto.SetUnlockKey(_hide.HideInput());
+            _isKeySet = _crypto.SetUnlockKey(_hide.HideInput());
             return user;
         }
 

@@ -9,7 +9,10 @@
     </PropertyGroup>
 <ItemGroup>
     <Protobuf Include="Protos\*.proto" GrpcServices="Client" />
-    <Content Include="@(Protobuf)" LinkBase="" />    
+    <Content Include="Protos/chat.proto">
+      <GrpcServices>Client</GrpcServices>
+      <LinkBase></LinkBase>
+    </Content>    
 </ItemGroup>
 
     <ItemGroup>
