@@ -16,6 +16,9 @@ Besides the menu, you have the following commands at your use:
 - mv - If you just type mv, you move room, but if you input arguments like `mv NewName` you rename yourself
 - pwd - If you just type pwd you can change your secure key (hidden), if you add arguments like `pdw NewPassword` it changes to NewPassword
 
+#### Known issues
+When you build the project, VS sometimes claims that the class ChatRoom is static, however it is not static. It looks like a bug in the protobuf generated class, this is easily fixed with the editor suggestion of making ChatRoom non static.
+
 ### Changelog
 | Version | Change |
 |-|-|
@@ -26,6 +29,7 @@ Besides the menu, you have the following commands at your use:
 | 0.2.0 | Now with encryption |
 | 0.2.5 | Works with multiple users |
 | 0.5.0 | UI added to the client, possibility to change name, password etc. |
+| 1.0.0 | First *real* release, just some code cleanup |
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Roadmap
