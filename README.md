@@ -43,6 +43,15 @@ When you build the project, VS sometimes claims that the class ChatRoom is stati
 - [ ] Create a web frontend
 - [ ] Further expansions?
 
+### Installed packages and framework version
+| Version | Name | Client | Server |
+|-|-|-|-|
+|3.6.1|Google.Protobuf|X||
+|1.20.0|Grpc.Core|X||
+|1.20.0|Grpc.Tools|X||
+|2.41.0|Grpc.AspNetCore||X|
+|6.0|.Net|X|X|
+|10|C#|X|X|
 
 ### License
 * Software: Apache 2.0
