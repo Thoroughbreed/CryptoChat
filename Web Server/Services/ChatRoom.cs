@@ -91,8 +91,8 @@ namespace Web_Server.Services
 
         private async Task RenameUser(Message message)
         {
-            var tempName = message.User;
             var foundUser = _users.FirstOrDefault(x => x.Guid == Guid.Parse(message.Guid));
+            var tempName = foundUser?.Name;
             if (foundUser != null)
             {
                 foundUser.Name = message.Text.Substring(3);
