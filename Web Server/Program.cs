@@ -17,7 +17,7 @@ builder.Services.AddSingleton(typeof(ChatRoom));
 builder.WebHost.UseKestrel(
     options =>
     {
-        options.Listen(IPAddress.Any, 5000, o => o.Protocols = HttpProtocols.Http2 );
+        options.Listen(IPAddress.Any, 50005, o => o.Protocols = HttpProtocols.Http2 );
     });
 
 var app = builder.Build();

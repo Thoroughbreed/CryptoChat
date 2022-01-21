@@ -20,7 +20,7 @@ namespace Console_Client
         static async Task Main(string[] args)
         {
             Guid guid = Guid.NewGuid();
-            string conn = "127.0.0.1:5000";
+            string conn = "127.0.0.1:50005";
             string? user = "Default User";
             string room = "1";
             bool mainMenuActive = true;
@@ -187,7 +187,7 @@ namespace Console_Client
                     Console.WriteLine("Out of range, please input a number between 1 and 65535");
                 }
             } while (_bool);
-            string port = input ?? "5000";
+            string port = input ?? "50005";
             
             return ip + ":" + port;
         }
