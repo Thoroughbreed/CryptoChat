@@ -22,13 +22,13 @@ When you build the project, VS sometimes claims that the class ChatRoom is stati
 ### Changelog
 | Version | Change |
 |-|-|
-| 0.0.1 | First release, smoke test |
-| 0.1.0 | Chat works! |
+| 0.1.0 | First release, smoke test |
+| 0.1.1 | Chat works! |
 | 0.1.2 | Multiple people can join |
 | 0.1.3 | Now with sessions |
 | 0.2.0 | Now with encryption |
-| 0.2.5 | Works with multiple users |
-| 0.5.0 | UI added to the client, possibility to change name, password etc. |
+| 0.2.1 | Works with multiple users |
+| 0.3.0 | UI added to the client, possibility to change name, password etc. |
 | 1.0.0 | First *real* release, just some code cleanup |
 <p align="right">(<a href="#top">back to top</a>)</p>
 
