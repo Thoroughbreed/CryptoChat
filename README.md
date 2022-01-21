@@ -30,6 +30,7 @@ When you build the project, VS sometimes claims that the class ChatRoom is stati
 | 0.2.1 | Works with multiple users |
 | 0.3.0 | UI added to the client, possibility to change name, password etc. |
 | 1.0.0 | First *real* release, just some code cleanup |
+| 1.0.1 | Changed default port from 5000 to 50005 |
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Roadmap
